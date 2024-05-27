@@ -31,6 +31,17 @@ def read_pdf(pdf_path: str) -> str:
 
     return text
 
+def save_text(text_content: str, output_file_path: str) -> None:
+    """
+    テキスト文字列を指定されたファイルに保存する関数。
+
+    :param text_content: 保存するテキスト内容
+    :param output_file_path: 保存先のファイルパス
+    """
+    with open(output_file_path, 'w', encoding='utf-8') as file:
+        file.write(text_content)
+    print(f"テキストファイルが正常に保存されました: {output_file_path}")
+
 
 def generate_yaml(paper_content: str) -> str:
     """
@@ -54,10 +65,12 @@ def generate_yaml(paper_content: str) -> str:
                 "role": "user",
                 "content": f"""
                 {paper_content}
-                上記の論文内容を章や内容ごとに階層分けして、
-                yaml形式に変換してください。
-                内容は省略せずに、抜け漏れが無いようできる限り細かく出力してください。
-                回答は日本語でお願いします。
+                上記の論文内容をyaml形式に変換してください。
+                - 構成は「章」「節」「項」という階層で出力してください。
+                - 内容は省略せずに、抜け漏れが無いようできる限り細かく出力してください。
+                - Abstractも含めて出力してください。
+                - 日本語で回答してください。
+                - yaml以外の出力はしないでください。
                 """
             }
         ]
