@@ -112,3 +112,4 @@ def generate_tex(yaml_structure: list, paper_title: str) -> None:
         tex_content = tex_content.replace("```latex", "").replace("```", "").strip()
         with open(f"{save_dir}/number_{i}.tex", "w") as f:
             f.write(tex_content)
+        print(f"({i+1}/{len(yaml_structure)}) texファイル生成完了！")

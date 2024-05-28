@@ -9,6 +9,7 @@ parser.add_argument('--paper', type=str, required=True)
 
 from scripts.extrace_yaml import read_pdf, generate_yaml, save_text, save_yaml
 from scripts.generate_tex import extract_yaml_structure, generate_tex
+from scripts.generate_pdf import generate_slide
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -33,3 +34,6 @@ if __name__ == "__main__":
 
     # generate_tex(result, args.paper)
     # print("📝 6. LaTeXファイルの生成が完了しました！")
+
+    generate_slide(args.paper)
+    print("📝 7. PDFの生成が完了しました！")
