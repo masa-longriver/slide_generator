@@ -4,7 +4,7 @@
 
 ## 事前準備
 
-1. OpenAIのAPIキーを取得
+1. OpenAIのAPIキーを取得（有料）
 
   - 以下のサイト(OpenAI API)に登録して、OpenAIのAPIキーを取得してください。
   - [OpenAI API](https://openai.com/index/openai-api/)
@@ -55,3 +55,8 @@ OPENAI_API_KEY=[OpenAIのAPIキー]
 ```
 python main.py --paper=タイトル名
 ```
+
+## ！！注意！！
+
+このプログラムでは生成AIの出力をそのまま処理に使用する箇所が複数あります。
+生成AIの出力には誤りがあることがあるため、実行中にエラーが起こった場合は生成AIの出力部分を適宜修正してください。
