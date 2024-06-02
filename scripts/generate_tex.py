@@ -1,4 +1,5 @@
 import os
+import pickle
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -74,42 +75,75 @@ def extract_yaml_structure(yaml_file_path: str) -> list:
 
     return local_context['result']
 
-def generate_tex(yaml_structure: list, paper_title: str) -> None:
+def save_result(result: list, paper_title: str) -> None:
+    """
+    結果をpickleファイルに保存する関数。
+
+    :param result: 保存する結果のリスト
+    :param paper_title: 論文のタイトル
+    """
+    with open(f"../logs/middle_results/{paper_title}.pkl", "wb") as f:
+        pickle.dump(result, f)
+
+def generate_tex(paper_title: str) -> None:
     """
     指定されたYAML構造に基づいて、LaTeXファイルを生成する関数。
 
     :param yaml_structure: 論文タイトル、章、節、項が順番通りに格納されたリスト
     """
+    with open(f"../logs/middle_results/{paper_title}.pkl", "rb") as f:
+        yaml_structure = pickle.load(f)
     save_dir = os.path.join("../logs/texs", paper_title)
     os.makedirs(save_dir, exist_ok=True)
+
     for i, content in enumerate(yaml_structure):
+        system_prompt = """
+        あなたは日本の学術研究のスペシャリストで、大学教授です。
+        これから勉強会で、与えられた論文について、
+        情報学を専攻している大学院生に説明します。
+        勉強会の準備として、論文を説明するためのスライドをLaTeXで作成します。
+        """
+
+        if i == 0:
+            add_cond = "# \end{document}は書かないでください。"
+        elif i > 0 and i < len(yaml_structure) - 1:
+            add_cond = "# コマンドは\begin{frame}, \end{frame}, \begin{itemize}, \end{itemize}, \item以外は絶対に使用しないでください。"
+            add_cond += "# \fontfamily, \\usefont, \renewcommand, \setmainfont は書かないでください。"
+        else:
+            add_cond = "# 最後に\end{document}を書いてください。"
+
+        user_prompt = f"""
+        content:
+        {content}
+
+        上記の内容から内容を膨らませて、
+        学生に説明するためのスライドをLaTeXで生成してください。
+        これは{len(yaml_structure)}つのスライドのうち、{i+1}番目のスライドです。
+
+        # 生成したLaTeXコードはスライドPDFの生成に使用します。
+        # そのままPDFの生成に使用できるよう、コードは正しい位置に出力してください。
+        # 説明はすべて日本語で出力してください。
+        # フォントには'IPAexMincho'を使用してください。
+        
+        {add_cond}
+        LaTeXコードのみを出力、その他には何も書かないでください。
+        """
+
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "system",
-                    "content": """
-                    あなたは日本の学術研究のスペシャリストで、大学教員です。
-                    これから勉強会で、与えられた論文について学生に説明します。
-                    勉強会の準備として、論文を説明するためのスライドをLaTeXで作成します。
-                    """
+                    "content": system_prompt
                 },
                 {
                     "role": "user",
-                    "content": f"""
-                    content:
-                    {content}
-
-                    上記の内容から、学生に分かりやすく説明するための説明を
-                    LaTeXで書いてください。
-                    説明はすべて日本語にしてください。
-                    LaTeXコードのみを出力、その他は何も書かないでください。
-                    """
+                    "content": user_prompt
                 }
             ]
         )
         tex_content = response.choices[0].message.content
         tex_content = tex_content.replace("```latex", "").replace("```", "").strip()
-        with open(f"{save_dir}/number_{i}.tex", "w") as f:
+        with open(f"{save_dir}/number_{i:02}.tex", "w") as f:
             f.write(tex_content)
         print(f"({i+1}/{len(yaml_structure)}) texファイル生成完了！")

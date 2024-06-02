@@ -1,5 +1,5 @@
 from .extrace_yaml import read_pdf, generate_yaml, save_text, save_yaml
-from .generate_tex import extract_yaml_structure, generate_tex
+from .generate_tex import extract_yaml_structure, generate_tex, save_result
 from .generate_pdf import generate_slide
 
 __all__ = [
@@ -10,5 +10,6 @@ __all__ = [
     "extract_yaml_structure",
     "generate_tex",
     "generate_slide",
+    "save_result",
 ]
 

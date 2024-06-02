@@ -1,65 +1,103 @@
-def extract_paper_structure():
-    # YAMLファイルから手動で書き写した内容
+def parse_yaml_structure():
     yaml_content = {
-        'A_DECODER-ONLY_FOUNDATION_MODEL_FOR_TIME-SERIES_FORECASTING': {
-            '論文情報': {
-                'タイトル': 'A DECODER-ONLY FOUNDATION MODEL FOR TIME-SERIES FORECASTING',
-                '著者': [{'名前': 'Abhimanyu Das'}, {'名前': 'Weihao kong'}, {'名前': 'Rajat Sen'}, {'名前': 'Yichen Zhou'}],
-                '所属': 'Google Research', 
-                '連絡先': '{abhidas, weihaokong, senrajat, yichenzhou}@google.com',
-                '日付': 'April 19, 2024', 
-                'arXiv': 'arXiv:2310.10688v4 [cs.CL] 17 Apr 2024'
-            }, 
-            'アブストラクト': {
-                '内容': '最近の自然言語処理（NLP）における大規模言語モデルの進展に触発されて、我々は様々な公開データセットにおいて、最先端の教師あり予測モデルに近い精度を持つ 時系列予測のための基盤モデルを設計した。我々のモデルは、入力パッチングを用いたデコーダースタイルの注意モデルの事前学習に基づいており、実世界および合成 データセットから成る大規模な時系列コーパスを使用している。多様な未見の予測データセットに関する実験は、異なるドメイン、予測ホライゾン、および時間粒度 にわたって正確なゼロショット予測を生み出すことができることを示している。\n'
-            }, 
-            '章': [
-                {'章番号': 1, 'タイトル': 'Introduction', '内容': '時系列データは、小売、金融、製造、ヘルスケア、自然科学など、さまざまなドメインで遍在している。これらのドメインでは、時系列データの最も重要な 用途の一つは予測である。時系列予測は、多くの科学的および産業的アプリケーション、例えば、小売供給チェーンの最適化、エネルギーおよび交通予測、 天気予報などにとって重要である。近年、深層学習モデルが登場し、豊富な多変量時系列データの予測において、古典的な統計手法をしばしば凌駕している。 NLP分野では、下流のNLPタスク用の大規模基盤モデルが急速に進展している。これにより、"大量の時系列データを学習した大規模事前学習モデルは、 未見のデータセットに対する時系列予測に役立つパターンを学習することが可能か？" という疑問が生じた。この論文では、未見のデータセットにおいても ゼロショットで優れた予測性能を持つ時系列基盤モデルが可能であることを示そうとする。\n'}, 
-                {'章番号': 2, 'タイトル': 'Related Work', '内容': '過去10年間において、深層学習モデルが大規模なトレーニングデータセットを用いた時系列予測において効果的であることが示されている。予測モデルは 大まかに以下のカテゴリーに分類できる: (i) ローカル単変量モデル、(ii) グローバル単変量モデル、(iii) グローバル多変量モデル。これらのモデルは 主に教師あり設定で使用されているが、一部の研究は転移学習も扱っている。NLPのLLMsを時系列予測に再利用する研究も最近注目されているが、我々の モデルは専ら時系列データに基づいて事前学習され、ゼロショット性能が非常に優れている。\n'}, 
-                {'章番号': 3, 'タイトル': 'Problem Definition', '内容': '本研究の目標は、時系列の過去Cの時点を入力として未来のHの時点を予測するゼロショット予測モデルを構築することである。与えられた時系列データ の過去y1:Lと入力マスクm1:Lを使って予測を行い、その精度をMAEなどのメトリックで評価する。\n'}, 
-                {'章番号': 4, 'タイトル': 'Model Architecture', '小節': [
-                    {'小節番号': 4.1, 'タイトル': 'Patching', '内容': '入力時系列データをトークンに分割し、長いホライゾンの予測効率を向上させる。トランスフォーマースタイルのモデルの特徴を活用し、入力パッチの 長さやマスキングの戦略を慎重に決定する。\n'}, 
-                    {'小節番号': 4.2, 'タイトル': 'Decoder-only model', '内容': '入力パッチが過去のパッチに依存して次のパッチを予測するデコーダースタイルのトレーニングを行う。これにより、入力パッチを用いた予測効率を 向上させる。\n'}, 
-                    {'小節番号': 4.3, 'タイトル': 'Longer output patches', '内容': 'オートレグレッシブデコーディングではなく、一度に長いホライゾンを直接予測することで精度を向上させる。ただし、出力パッチの長さが 長すぎると難点もあるので、適度な長さを選択する。\n'}, 
-                    {'小節番号': 4.4, 'タイトル': 'Patch Masking', '内容': 'モデルが異なるコンテキストの長さで学習できるように、トレーニング中にパッチのランダムマスキングを使用する。\n'}, 
-                    {'小節番号': 4.5, 'タイトル': 'Input Layers', '内容': '入力レイヤーは時系列を前処理し、トークンに変換する。パッチごとにベクトルに変換し、位置エンコーディングとマスクを適用する。\n'}, 
-                    {'小節番号': 4.6, 'タイトル': 'Stacked Transformer', '内容': 'トランスフォーマーレイヤーを積み重ねて自己注意機構を用い、入力トークンをエンコードする。\n'}, 
-                    {'小節番号': 4.7, 'タイトル': 'Output Layers', '内容': '出力レイヤーは予測を行うために残差ブロックを経由してトークンを予測に変換する。\n'}, 
-                    {'小節番号': 4.8, 'タイトル': 'Loss Function', '内容': 'ポイント予測に焦点を当て、MSEなどの損失関数を最小化する。場合によっては確率的予測にも対応可能で、マルチヘッドアーキテクチャを用いる。\n'}, 
-                    {'小節番号': 4.9, 'タイトル': 'Training', '内容': 'パッチのマスキング戦略を用いて標準的なミニバッチ勾配降下法を使用してトレーニングする。\n'}, 
-                    {'小節番号': 4.1, 'タイトル': 'Inference', '内容': 'トレーニング済みのネットワークを使用して予測ホライゾンをオートレグレッシブデコーディングで生成する。\n'}
-                ]}, 
-                {'章番号': 5, 'タイトル': 'Pretraining Details', '内容': '我々の時系列コーパスは、Googleトレンド、Wiki Pageviewsおよび合成データから成り立つ。大量のデータを利用してモデルを効果的に事前学習し、 異なるドメインのパターンを捉える。トレーニング設定やデータ混合の戦略も詳細に述べる。\n'}, 
-                {'章番号': 6, 'タイトル': 'Empirical Results', '小節': [
-                    {'小節番号': 6.1, 'タイトル': 'Zero-shot Evaluation', '内容': '我々のモデルが異なるコンテキストやホライゾンの設定において、ベースラインモデルに匹敵するゼロショット性能を示すことを様々なデータセットで 実証する。\n'}, 
-                    {'小節番号': 6.2, 'タイトル': 'Ablation', '内容': 'モデルアーキテクチャのデザインに関するさまざまな選択を正当化するためのアブレーションスタディを実施する。\n'}
-                ]}, 
-                {'章番号': 7, 'タイトル': 'Conclusion', '内容': '本論文は、ゼロショット性能が優れた時系列予測のための実用的な基盤モデルTimesFMを提示した。将来的な展望や課題についても詳細に議論する。\n'}, 
-                {'章番号': 8, 'タイトル': 'Impact Statement', '内容': '本モデルの応用可能性と、データプライバシーやバイアスに関する倫理的・社会的な考慮事項について議論する。下流のタスクのためモデル公開の重要性と 責任あるリリースを強調する。\n'}
-            ]
-        }
+        'LightGBM': [
+            {'Abstract': [
+                'Gradient Boosting Decision Tree (GBDT) は人気のある機械学習アルゴリズムであり、XGBoost や pGBRT など多くの効果的な実装例がある。',
+                'しかし、特徴次元が高くデータサイズが大きい場合、効率性とスケーラビリティは依然として満足のいかないものとなっている。',
+                '主要な理由の一つは、各特徴に対して情報ゲインを推定するためにすべてのデータインスタンスをスキャンしなければならないため、非常に時間がかかることである。',
+                'この問題に対処するために、2つの新しい技術を提案する：Gradient-based One-Side Sampling (GOSS) と Exclusive Feature Bundling (EFB)。',
+                'GOSSでは、勾配の小さいデータインスタンスを大幅に除外し、残りを使用して情報ゲインを推定する。',
+                'EFBでは、互いに排他的な特徴をバンドルすることで特徴の数を削減する。最適なバンドルの発見はNP困難であるが、貪欲なアルゴリズムが良好な近似を達成できる。',
+                'GOSSとEFBを使用した新しいGBDTの実装をLightGBMと呼ぶ。複数の公開データセットでの実験により、LightGBMはトレーニングプロセスを最大で20倍以上高速化し、ほぼ同じ精度を達成することが示された。'
+            ]},
+            {'Introduction': [
+                'Gradient Boosting Decision Tree (GBDT) は効率性、精度、解釈可能性の点で広く使用される。',
+                '大規模データの出現によりGBDTは新たな課題に直面している。特に精度と効率性のトレードオフが問題である。',
+                '従来のGBDTの実装は、各特徴に対してすべてのデータインスタンスをスキャンし、情報ゲインを推定するため、計算の複雑さが特徴数とインスタンス数に比例し、大規模データを扱うと時間がかかる。',
+                'データインスタンスや特徴の数を削減するためには、非自明な方法が必要であり、ここで2つの新技術GOSSとEFBを提案する。'
+            ]},
+            {'Preliminaries': [
+                {'GBDT and Its Complexity Analysis': [
+                    'GBDTは決定木のアンサンブルモデルで、各反復で負の勾配にフィットする。',
+                    '最も時間がかかる部分は、分割点を見つけることである。',
+                    '事前ソートアルゴリズムとヒストグラムベースのアルゴリズムがある。',
+                    'ヒストグラムベースのアルゴリズムはメモリ消費およびトレーニング速度の面でより効率的である。'
+                ]},
+                {'Related Work': [
+                    'XGBoost、pGBRT、scikit-learn、Rのgbmなど多くのGBDTの実装がある。',
+                    'データサイズの削減にはダウンサンプリングが一般的であるが、ほとんどの手法がAdaBoostに基づいているため、GBDTには直接適用できない。',
+                    '特徴数の削減には弱い特徴のフィルタリングが一般的だが、特徴の冗長性の仮定に強く依存する。',
+                    '我々の提案するGOSSとEFBはこれらの限界を克服するものである。'
+                ]}
+            ]},
+            {'Gradient-based One-Side Sampling': [
+                {'Algorithm Description': [
+                    'GOSSでは、すべての大きな勾配を持つインスタンスを保持し、小さな勾配を持つインスタンスをランダムにサンプリングする。',
+                    '小さな勾配を持つデータには定数乗数を導入してデータ分布への影響を補正する。'
+                ]},
+                {'Theoretical Analysis': [
+                    'GOSSはサンプルされた情報ゲインの推定値を用いて分割点を決定し、計算コストを大幅に削減する。',
+                    'GOSSはランダムサンプリングよりも優れていることが理論的に証明されている。'
+                ]}
+            ]},
+            {'Exclusive Feature Bundling': [
+                {'Greedy Bundling': [
+                    '最適なバンドル戦略を見つけるのはNP困難であるため、近似アルゴリズムを用いる。',
+                    'グラフ彩色問題に還元し、適度な近似比を持つ貪欲アルゴリズムを使用してバンドルを構築する。'
+                ]},
+                {'Merge Exclusive Features': [
+                    'ヒストグラムベースのアルゴリズムは離散的なビンを使用するので、排他的特徴を異なるビンに配置することでバンドルを構築する。',
+                    'こうして作られた特徴バンドルは、個々の特徴と同様に機能する。'
+                ]}
+            ]},
+            {'Experiments': [
+                {'Overall Comparison': [
+                    'XGBoostおよびLightGBMの基本実装と比較してLightGBMを評価。',
+                    '複数の公開データセットでの実験により、LightGBMは最速であり、ほぼ同じ精度を達成する。'
+                ]},
+                {'Analysis on GOSS': [
+                    'GOSSの速度向上と精度について評価。',
+                    'SGBと比較し、GOSSがより高精度であることを示す。'
+                ]},
+                {'Analysis on EFB': [
+                    'EFBの速度向上について評価。',
+                    'EFBは非常に効果的であり、GBDTトレーニングプロセスを大幅に高速化する。'
+                ]}
+            ]},
+            {'Conclusion': [
+                '本論文では、Gradient-based One-Side Sampling (GOSS) と Exclusive Feature Bundling (EFB) を含む新しいGBDTアルゴリズムLightGBMを提案した。',
+                '理論的な分析と実験結果を示し、LightGBMがXGBoostおよびSGBを計算速度とメモリ消費の点で大幅に上回ることを確認した。',
+                '今後の研究では、GOSSにおけるaとbの最適な選択を検討し、EFBの性能をさらに向上させる予定である。'
+            ]}
+        ]
     }
 
     result = []
-    paper = yaml_content.get('A_DECODER-ONLY_FOUNDATION_MODEL_FOR_TIME-SERIES_FORECASTING', {})
-    title = paper.get('論文情報', {}).get('タイトル', '')
-    result.append(f"(0, 'タイトル', '{title}')")
+    
+    def add_to_result(index, title, content):
+        result.append(f"({index}, {title}, {content})")
 
-    for chapter in paper.get('章', []):
-        chapter_number = chapter.get('章番号', '')
-        chapter_title = chapter.get('タイトル', '')
-        chapter_content = chapter.get('内容', '')
-        result.append(f"({chapter_number}, '章: {chapter_title}', '{chapter_content}')")
-
-        for section in chapter.get('小節', []):
-            section_number = section.get('小節番号', '')
-            section_title = section.get('タイトル', '')
-            section_content = section.get('内容', '')
-            result.append(f"({section_number}, '節: {section_title}', '{section_content}')")
-
+    index = 0
+    for paper_title, sections in yaml_content.items():
+        add_to_result(index, '論文タイトル', paper_title)
+        index += 1
+        for section in sections:
+            for section_title, subsections in section.items():
+                add_to_result(index, '章', section_title)
+                index += 1
+                if isinstance(subsections, list):
+                    for item in subsections:
+                        if isinstance(item, dict):
+                            for subsection_title, subitems in item.items():
+                                add_to_result(index, '節', subsection_title)
+                                index += 1
+                                if isinstance(subitems, list):
+                                    for subitem in subitems:
+                                        add_to_result(index, '項', subitem)
+                                        index += 1
+                        else:
+                            add_to_result(index, '節', item)
+                            index += 1
     return result
 
-# 実行例
-result = extract_paper_structure()
-for item in result:
-    print(item)
+result = parse_yaml_structure()
